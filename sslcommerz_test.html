@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SSLCommerz Sandbox Tester</title>
+</head>
+<body>
+  <h2>SSLCommerz Sandbox Payment Test</h2>
+
+  <form action="http://localhost:5000/pay" method="POST">
+    <label>Store ID:</label>
+    <input type="text" name="store_id" value="your_sandbox_id"><br><br>
+
+    <label>Store Password:</label>
+    <input type="text" name="store_passwd" value="your_sandbox_pass"><br><br>
+
+    <label>Amount (BDT):</label>
+    <input type="number" name="total_amount" value="100"><br><br>
+
+    <button type="submit">Run Test Transaction</button>
+  </form>
+</body>
+</html>

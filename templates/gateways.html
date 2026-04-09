@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><title>Available Gateways</title></head>
+<body>
+  <h2>Select a Payment Gateway</h2>
+  {% for gw in gateways %}
+    <div style="margin:10px;">
+      <img src="{{ gw.logo }}" alt="{{ gw.name }}" width="80">
+      {% if gw.redirectGatewayURL %}
+        <button onclick="window.open('{{ gw.redirectGatewayURL }}','_blank')">
+          Pay with {{ gw.name }}
+        </button>
+      {% else %}
+        <button disabled>Not available in sandbox</button>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <h2>Raw JSON Response</h2>
+  <pre>{{ raw_json | tojson(indent=2) }}</pre>
+</body>
+</html>

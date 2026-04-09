@@ -1,0 +1,3 @@
+ 
+Store ID: healt69d2ddc0e9804
+Store Password (API/Secret Key): healt69d2ddc0e9804@ssl
