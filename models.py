@@ -11,6 +11,5 @@ class Transaction(db.Model):
 
     bank_tran_id = db.Column(db.String(100))
 
-    # 🔥 DEBUG FIELDS (IMPORTANT)
     raw_callback = db.Column(db.Text)
     raw_validation = db.Column(db.Text)

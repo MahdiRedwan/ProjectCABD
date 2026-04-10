@@ -14,7 +14,7 @@ def validate_payment(val_id):
     try:
         res = requests.get(url, params=params, timeout=10)
 
-        print("VALIDATION RAW:", res.text)
+        print("RAW VALIDATION:", res.text)
 
         try:
             return res.json()

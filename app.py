@@ -3,10 +3,10 @@ import time
 import requests
 import json
 
-from config import STORE_ID, STORE_PASSWORD, BASE_URL
 from db import db
 from models import Transaction
 from sslcommerz import validate_payment
+from config import STORE_ID, STORE_PASSWORD, BASE_URL
 
 app = Flask(__name__)
 
@@ -23,6 +23,9 @@ def index():
     return render_template("index.html")
 
 
+# ======================
+# PAYMENT INIT
+# ======================
 @app.route("/pay", methods=["POST"])
 def pay():
     amount = request.form.get("amount")
@@ -40,7 +43,7 @@ def pay():
         "cus_name": "Test User",
         "cus_email": "test@mail.com",
         "cus_phone": "01700000000",
-        "product_name": "Demo Product",
+        "product_name": "Demo",
         "product_category": "General",
         "product_profile": "general"
     }
@@ -58,34 +61,27 @@ def pay():
     return data
 
 
-# ===========================
-# 🔥 FIXED SUCCESS LOGIC
-# ===========================
+# ======================
+# SUCCESS CALLBACK (FIXED)
+# ======================
 @app.route("/success", methods=["GET", "POST"])
 def success():
-    callback_data = request.values.to_dict()
+    callback = request.values.to_dict()
 
-    val_id = callback_data.get("val_id")
-    tran_id = callback_data.get("tran_id")
+    val_id = callback.get("val_id")
+    tran_id = callback.get("tran_id")
 
-    print("CALLBACK:", callback_data)
+    payment = validate_payment(val_id) if val_id else None
 
-    payment = None
-
-    # STEP 1: validate if possible
-    if val_id:
-        payment = validate_payment(val_id)
-
-    # STEP 2: SAFE STATUS DECISION
+    # ---------- STATUS FIX ----------
     if payment and isinstance(payment, dict):
-
         raw_status = str(payment.get("status", "")).upper()
 
-        if "VALID" in raw_status and "RISK" in raw_status:
-            status = "SUCCESS WITH RISK"
-
-        elif "VALID" in raw_status:
+        if raw_status == "VALIDATED":
             status = "SUCCESS"
+
+        elif raw_status == "VALIDATED_RISK":
+            status = "SUCCESS WITH RISK"
 
         else:
             status = "FAILED"
@@ -95,7 +91,6 @@ def success():
         bank_tran_id = payment.get("bank_tran_id", "")
 
     else:
-        # 🔥 IMPORTANT: sandbox-safe fallback
         status = "PENDING VERIFICATION"
         card_type = "UNKNOWN"
         amount = 0
@@ -107,7 +102,7 @@ def success():
         status=status,
         payment_method=card_type,
         bank_tran_id=bank_tran_id,
-        raw_callback=json.dumps(callback_data),
+        raw_callback=json.dumps(callback),
         raw_validation=json.dumps(payment) if payment else None
     )
 
@@ -117,16 +112,40 @@ def success():
     return render_template("success.html", txn=txn)
 
 
+# ======================
+# FAIL CALLBACK (FIXED)
+# ======================
 @app.route("/fail", methods=["GET", "POST"])
 def fail():
-    return render_template("fail.html")
+    callback = request.values.to_dict()
+
+    tran_id = callback.get("tran_id", f"FAIL_{int(time.time())}")
+
+    txn = Transaction(
+        tran_id=tran_id,
+        amount=0,
+        status="FAILED",
+        payment_method="UNKNOWN",
+        raw_callback=json.dumps(callback)
+    )
+
+    db.session.add(txn)
+    db.session.commit()
+
+    return render_template("fail.html", txn=txn)
 
 
+# ======================
+# CANCEL
+# ======================
 @app.route("/cancel", methods=["GET", "POST"])
 def cancel():
     return render_template("cancel.html")
 
 
+# ======================
+# DASHBOARD
+# ======================
 @app.route("/dashboard")
 def dashboard():
     txns = Transaction.query.order_by(Transaction.id.desc()).all()
