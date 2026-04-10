@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SSLCommerz Sandbox Test</title>
+    <title>Payment Demo</title>
 </head>
 <body>
+    <h2>SSLCommerz Payment Demo</h2>
 
-<h2>Payment Page</h2>
+    <form action="/pay" method="POST">
+        <input type="number" name="amount" placeholder="Enter amount" required>
+        <button type="submit">Pay</button>
+    </form>
 
-<form action="/pay" method="POST">
-    <label>Amount (BDT):</label>
-    <input type="number" name="amount" value="100" required>
-
-    <button type="submit">Pay Now</button>
-</form>
-
+    <a href="/admin">Admin Dashboard</a>
 </body>
 </html>

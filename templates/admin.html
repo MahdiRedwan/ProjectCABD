@@ -1,0 +1,19 @@
+<h1>Transaction Dashboard</h1>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Transaction ID</th>
+        <th>Amount</th>
+        <th>Status</th>
+    </tr>
+
+    {% for t in transactions %}
+    <tr>
+        <td>{{ t.id }}</td>
+        <td>{{ t.tran_id }}</td>
+        <td>{{ t.amount }}</td>
+        <td>{{ t.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
