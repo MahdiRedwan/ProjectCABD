@@ -9,7 +9,7 @@ STORE_ID = "healt69d2ddc0e9804"
 STORE_PASSWORD = "healt69d2ddc0e9804@ssl"
 
 # 🌍 Replace this after deployment (Render / Railway / VPS)
-BASE_URL = "https://your-app.onrender.com"
+BASE_URL = "https://projectcabd-production.up.railway.app"
 
 
 @app.route('/')
@@ -56,17 +56,18 @@ def pay():
         return data
 
 
-@app.route('/success', methods=['POST'])
+@app.route('/success', methods=['GET', 'POST'])
 def success():
     return render_template("success.html")
 
 
-@app.route('/fail', methods=['POST'])
+@app.route('/fail', methods=['GET', 'POST'])
 def fail():
     return render_template("fail.html")
 
 
-@app.route('/cancel', methods=['POST'])
+
+@app.route('/cancel', methods=['GET', 'POST'])
 def cancel():
     return render_template("cancel.html")
 
