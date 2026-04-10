@@ -57,15 +57,26 @@ def pay():
 
 @app.route("/success", methods=["GET", "POST"])
 def success():
-    val_id = request.args.get("val_id")
-    tran_id = request.args.get("tran_id")
+    val_id = request.values.get("val_id")
+    tran_id = request.values.get("tran_id")
 
-    payment = validate_payment(val_id)
+    print("VAL_ID:", val_id)
 
-    status_raw = payment.get("status", "FAILED")
-    card_type = payment.get("card_type", "UNKNOWN")
-    bank_tran_id = payment.get("bank_tran_id", "")
+    payment = validate_payment(val_id) if val_id else None
 
+    if payment:
+        status_raw = payment.get("status", "FAILED")
+        card_type = payment.get("card_type", "UNKNOWN")
+        amount = payment.get("amount", 0)
+        bank_tran_id = payment.get("bank_tran_id", "")
+    else:
+        # fallback (never crash)
+        status_raw = "FAILED"
+        card_type = "UNKNOWN"
+        amount = 0
+        bank_tran_id = ""
+
+    # map status
     if status_raw == "VALIDATED":
         status = "SUCCESS"
     elif status_raw == "VALIDATED_RISK":
@@ -75,7 +86,7 @@ def success():
 
     txn = Transaction(
         tran_id=tran_id,
-        amount=payment.get("amount", 0),
+        amount=amount,
         status=status,
         payment_method=card_type,
         bank_tran_id=bank_tran_id
@@ -87,20 +98,20 @@ def success():
     return render_template("success.html", txn=txn)
 
 
-@app.route("/dashboard")
-def dashboard():
-    txns = Transaction.query.all()
-    return render_template("dashboard.html", txns=txns)
-
-
-@app.route("/fail")
+@app.route("/fail", methods=["GET", "POST"])
 def fail():
     return render_template("fail.html")
 
 
-@app.route("/cancel")
+@app.route("/cancel", methods=["GET", "POST"])
 def cancel():
     return render_template("cancel.html")
+
+
+@app.route("/dashboard")
+def dashboard():
+    txns = Transaction.query.all()
+    return render_template("dashboard.html", txns=txns)
 
 
 if __name__ == "__main__":

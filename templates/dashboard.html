@@ -4,46 +4,44 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
 
 <div class="container">
 
-    <h2>📊 Transaction Dashboard</h2>
+<h2>Transaction Dashboard</h2>
 
-    <table>
-        <tr>
-            <th>Transaction ID</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Payment Method</th>
-        </tr>
+<table>
+<tr>
+    <th>ID</th>
+    <th>Amount</th>
+    <th>Status</th>
+    <th>Method</th>
+</tr>
 
-        {% for t in txns %}
-        <tr>
-            <td>{{ t.tran_id }}</td>
-            <td>{{ t.amount }}</td>
+{% for t in txns %}
+<tr>
+    <td>{{ t.tran_id }}</td>
+    <td>{{ t.amount }}</td>
 
-            <td class="
-                {% if t.status == 'SUCCESS' %}
-                    status-success
-                {% elif t.status == 'SUCCESS WITH RISK' %}
-                    status-risk
-                {% else %}
-                    status-failed
-                {% endif %}
-            ">
-                {{ t.status }}
-            </td>
+    <td class="
+    {% if t.status == 'SUCCESS' %}
+        status-success
+    {% elif t.status == 'SUCCESS WITH RISK' %}
+        status-risk
+    {% else %}
+        status-failed
+    {% endif %}
+    ">
+        {{ t.status }}
+    </td>
 
-            <td>{{ t.payment_method }}</td>
-        </tr>
-        {% endfor %}
+    <td>{{ t.payment_method }}</td>
+</tr>
+{% endfor %}
 
-    </table>
+</table>
 
-    <br>
-    <a href="/">🏠 Back to Home</a>
+<a href="/">Back</a>
 
 </div>
 

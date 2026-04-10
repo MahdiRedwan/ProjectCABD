@@ -11,9 +11,17 @@ def validate_payment(val_id):
         "format": "json"
     }
 
-    res = requests.get(url, params=params)
+    try:
+        res = requests.get(url, params=params, timeout=10)
 
-    if res.status_code != 200:
+        print("RAW RESPONSE:", res.text)  # debug
+
+        try:
+            return res.json()
+        except Exception:
+            print("❌ Not JSON response")
+            return None
+
+    except Exception as e:
+        print("❌ Request failed:", e)
         return None
-
-    return res.json()

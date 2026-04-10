@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Payment Result</title>
+    <title>Success</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
 
 <div class="container">
@@ -13,22 +12,18 @@
 
     {% if txn.status == "SUCCESS" %}
         <h3 class="status-success">✅ Payment Successful</h3>
-
     {% elif txn.status == "SUCCESS WITH RISK" %}
-        <h3 class="status-risk">⚠️ Payment Successful (With Risk)</h3>
-
+        <h3 class="status-risk">⚠️ Success With Risk</h3>
     {% else %}
-        <h3 class="status-failed">❌ Payment Status Unknown</h3>
+        <h3 class="status-failed">❌ Failed</h3>
     {% endif %}
 
-    <p><b>Transaction ID:</b> {{ txn.tran_id }}</p>
-    <p><b>Amount:</b> {{ txn.amount }}</p>
-    <p><b>Payment Method:</b> {{ txn.payment_method }}</p>
+    <p>Transaction: {{ txn.tran_id }}</p>
+    <p>Amount: {{ txn.amount }}</p>
+    <p>Method: {{ txn.payment_method }}</p>
 
-    <br>
-
-    <a href="/">🔁 Pay Again</a>
-    <a href="/dashboard">📊 View Dashboard</a>
+    <a href="/">Pay Again</a>
+    <a href="/dashboard">Dashboard</a>
 
 </div>
 
