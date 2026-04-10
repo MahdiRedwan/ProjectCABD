@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Payment Dashboard</title>
 </head>
 <body>
 
@@ -28,12 +27,12 @@
 <tr>
     <td colspan="4">
         <details>
-            <summary>🔍 View Raw SSLCommerz Data</summary>
+            <summary>🔍 View Full Raw Logs</summary>
 
-            <h4>Callback:</h4>
+            <h4>Callback Data</h4>
             <pre>{{ t.raw_callback }}</pre>
 
-            <h4>Validation:</h4>
+            <h4>Validation / System Response</h4>
             <pre>{{ t.raw_validation }}</pre>
         </details>
     </td>

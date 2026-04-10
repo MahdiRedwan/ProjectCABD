@@ -18,6 +18,9 @@ with app.app_context():
     db.create_all()
 
 
+# =========================
+# HOME
+# =========================
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -62,45 +65,36 @@ def pay():
 
 
 # =========================
-# SUCCESS (RAW DEBUG VERSION)
+# SUCCESS CALLBACK
 # =========================
 @app.route("/success", methods=["GET", "POST"])
 def success():
-    callback_data = request.values.to_dict()
+    callback = request.values.to_dict()
 
-    print("\n==== CALLBACK RAW ====")
-    print(callback_data)
+    val_id = callback.get("val_id")
+    tran_id = callback.get("tran_id")
 
-    val_id = callback_data.get("val_id")
-    tran_id = callback_data.get("tran_id")
+    payment = validate_payment(val_id) if val_id else None
 
-    payment = None
-
-    if val_id:
-        payment = validate_payment(val_id)
-
-    print("\n==== VALIDATION RAW ====")
-    print(payment)
-
-    # =========================
-    # SAFE STATUS LOGIC
-    # =========================
     status = "FAILED"
+    card_type = "UNKNOWN"
+    amount = 0
+    bank_tran_id = ""
 
     if payment and isinstance(payment, dict):
+
         raw_status = str(payment.get("status", "")).upper()
+        risk_level = int(payment.get("risk_level", 0))
 
-        print("RAW STATUS:", raw_status)
+        if raw_status == "VALID":
+            if risk_level == 0:
+                status = "SUCCESS"
+            else:
+                status = "SUCCESS WITH RISK"
 
-        if "VALID" in raw_status and "RISK" in raw_status:
-            status = "SUCCESS WITH RISK"
-
-        elif "VALID" in raw_status:
-            status = "SUCCESS"
-
-    card_type = payment.get("card_type", "UNKNOWN") if payment else "UNKNOWN"
-    amount = payment.get("amount", 0) if payment else 0
-    bank_tran_id = payment.get("bank_tran_id", "") if payment else ""
+        card_type = payment.get("card_type", "UNKNOWN")
+        amount = payment.get("amount", 0)
+        bank_tran_id = payment.get("bank_tran_id", "")
 
     txn = Transaction(
         tran_id=tran_id,
@@ -108,7 +102,7 @@ def success():
         status=status,
         payment_method=card_type,
         bank_tran_id=bank_tran_id,
-        raw_callback=json.dumps(callback_data),
+        raw_callback=json.dumps(callback),
         raw_validation=json.dumps(payment) if payment else None
     )
 
@@ -119,23 +113,21 @@ def success():
 
 
 # =========================
-# FAIL (SAVE RAW DATA)
+# FAIL CALLBACK (NEW + FIXED)
 # =========================
 @app.route("/fail", methods=["GET", "POST"])
 def fail():
-    callback_data = request.values.to_dict()
+    callback = request.values.to_dict()
 
-    print("\n==== FAIL CALLBACK RAW ====")
-    print(callback_data)
-
-    tran_id = callback_data.get("tran_id", f"FAIL_{int(time.time())}")
+    tran_id = callback.get("tran_id", f"FAIL_{int(time.time())}")
 
     txn = Transaction(
         tran_id=tran_id,
         amount=0,
         status="FAILED",
         payment_method="UNKNOWN",
-        raw_callback=json.dumps(callback_data)
+        raw_callback=json.dumps(callback),
+        raw_validation=json.dumps({"status": "FAILED_CALLBACK", "data": callback})
     )
 
     db.session.add(txn)
@@ -144,13 +136,32 @@ def fail():
     return render_template("fail.html", txn=txn)
 
 
+# =========================
+# CANCEL CALLBACK (NEW + LOGGED)
+# =========================
 @app.route("/cancel", methods=["GET", "POST"])
 def cancel():
-    return render_template("cancel.html")
+    callback = request.values.to_dict()
+
+    tran_id = callback.get("tran_id", f"CANCEL_{int(time.time())}")
+
+    txn = Transaction(
+        tran_id=tran_id,
+        amount=0,
+        status="CANCELLED",
+        payment_method="UNKNOWN",
+        raw_callback=json.dumps(callback),
+        raw_validation=json.dumps({"status": "CANCELLED_CALLBACK", "data": callback})
+    )
+
+    db.session.add(txn)
+    db.session.commit()
+
+    return render_template("cancel.html", txn=txn)
 
 
 # =========================
-# DASHBOARD (RAW VIEW ENABLED)
+# DASHBOARD
 # =========================
 @app.route("/dashboard")
 def dashboard():
