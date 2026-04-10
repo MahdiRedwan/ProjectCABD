@@ -6,13 +6,12 @@
 </head>
 <body>
 
-<div class="container">
-
 <h2>Transaction Dashboard</h2>
 
-<table>
+<table border="1" cellpadding="10">
+
 <tr>
-    <th>ID</th>
+    <th>Transaction</th>
     <th>Amount</th>
     <th>Status</th>
     <th>Method</th>
@@ -22,28 +21,26 @@
 <tr>
     <td>{{ t.tran_id }}</td>
     <td>{{ t.amount }}</td>
-
-    <td class="
-    {% if t.status == 'SUCCESS' %}
-        status-success
-    {% elif t.status == 'SUCCESS WITH RISK' %}
-        status-risk
-    {% else %}
-        status-failed
-    {% endif %}
-    ">
-        {{ t.status }}
-    </td>
-
+    <td>{{ t.status }}</td>
     <td>{{ t.payment_method }}</td>
+</tr>
+
+<tr>
+    <td colspan="4">
+        <details>
+            <summary>🔍 View Raw SSLCommerz Data</summary>
+
+            <h4>Callback:</h4>
+            <pre>{{ t.raw_callback }}</pre>
+
+            <h4>Validation:</h4>
+            <pre>{{ t.raw_validation }}</pre>
+        </details>
+    </td>
 </tr>
 {% endfor %}
 
 </table>
-
-<a href="/">Back</a>
-
-</div>
 
 </body>
 </html>

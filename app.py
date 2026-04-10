@@ -23,9 +23,9 @@ def index():
     return render_template("index.html")
 
 
-# ======================
+# =========================
 # PAYMENT INIT
-# ======================
+# =========================
 @app.route("/pay", methods=["POST"])
 def pay():
     amount = request.form.get("amount")
@@ -43,7 +43,7 @@ def pay():
         "cus_name": "Test User",
         "cus_email": "test@mail.com",
         "cus_phone": "01700000000",
-        "product_name": "Demo",
+        "product_name": "Demo Product",
         "product_category": "General",
         "product_profile": "general"
     }
@@ -61,40 +61,46 @@ def pay():
     return data
 
 
-# ======================
-# SUCCESS CALLBACK (FIXED)
-# ======================
+# =========================
+# SUCCESS (RAW DEBUG VERSION)
+# =========================
 @app.route("/success", methods=["GET", "POST"])
 def success():
-    callback = request.values.to_dict()
+    callback_data = request.values.to_dict()
 
-    val_id = callback.get("val_id")
-    tran_id = callback.get("tran_id")
+    print("\n==== CALLBACK RAW ====")
+    print(callback_data)
 
-    payment = validate_payment(val_id) if val_id else None
+    val_id = callback_data.get("val_id")
+    tran_id = callback_data.get("tran_id")
 
-    # ---------- STATUS FIX ----------
+    payment = None
+
+    if val_id:
+        payment = validate_payment(val_id)
+
+    print("\n==== VALIDATION RAW ====")
+    print(payment)
+
+    # =========================
+    # SAFE STATUS LOGIC
+    # =========================
+    status = "FAILED"
+
     if payment and isinstance(payment, dict):
         raw_status = str(payment.get("status", "")).upper()
 
-        if raw_status == "VALIDATED":
-            status = "SUCCESS"
+        print("RAW STATUS:", raw_status)
 
-        elif raw_status == "VALIDATED_RISK":
+        if "VALID" in raw_status and "RISK" in raw_status:
             status = "SUCCESS WITH RISK"
 
-        else:
-            status = "FAILED"
+        elif "VALID" in raw_status:
+            status = "SUCCESS"
 
-        card_type = payment.get("card_type", "UNKNOWN")
-        amount = payment.get("amount", 0)
-        bank_tran_id = payment.get("bank_tran_id", "")
-
-    else:
-        status = "PENDING VERIFICATION"
-        card_type = "UNKNOWN"
-        amount = 0
-        bank_tran_id = ""
+    card_type = payment.get("card_type", "UNKNOWN") if payment else "UNKNOWN"
+    amount = payment.get("amount", 0) if payment else 0
+    bank_tran_id = payment.get("bank_tran_id", "") if payment else ""
 
     txn = Transaction(
         tran_id=tran_id,
@@ -102,7 +108,7 @@ def success():
         status=status,
         payment_method=card_type,
         bank_tran_id=bank_tran_id,
-        raw_callback=json.dumps(callback),
+        raw_callback=json.dumps(callback_data),
         raw_validation=json.dumps(payment) if payment else None
     )
 
@@ -112,21 +118,24 @@ def success():
     return render_template("success.html", txn=txn)
 
 
-# ======================
-# FAIL CALLBACK (FIXED)
-# ======================
+# =========================
+# FAIL (SAVE RAW DATA)
+# =========================
 @app.route("/fail", methods=["GET", "POST"])
 def fail():
-    callback = request.values.to_dict()
+    callback_data = request.values.to_dict()
 
-    tran_id = callback.get("tran_id", f"FAIL_{int(time.time())}")
+    print("\n==== FAIL CALLBACK RAW ====")
+    print(callback_data)
+
+    tran_id = callback_data.get("tran_id", f"FAIL_{int(time.time())}")
 
     txn = Transaction(
         tran_id=tran_id,
         amount=0,
         status="FAILED",
         payment_method="UNKNOWN",
-        raw_callback=json.dumps(callback)
+        raw_callback=json.dumps(callback_data)
     )
 
     db.session.add(txn)
@@ -135,17 +144,14 @@ def fail():
     return render_template("fail.html", txn=txn)
 
 
-# ======================
-# CANCEL
-# ======================
 @app.route("/cancel", methods=["GET", "POST"])
 def cancel():
     return render_template("cancel.html")
 
 
-# ======================
-# DASHBOARD
-# ======================
+# =========================
+# DASHBOARD (RAW VIEW ENABLED)
+# =========================
 @app.route("/dashboard")
 def dashboard():
     txns = Transaction.query.order_by(Transaction.id.desc()).all()
