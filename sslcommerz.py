@@ -14,10 +14,12 @@ def validate_payment(val_id):
     try:
         res = requests.get(url, params=params, timeout=10)
 
-        # 🔥 log raw response
         print("VALIDATION RAW:", res.text)
 
-        return res.json()
+        try:
+            return res.json()
+        except:
+            return None
 
     except Exception as e:
         print("VALIDATION ERROR:", e)

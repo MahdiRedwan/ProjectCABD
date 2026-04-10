@@ -1,5 +1,4 @@
 from db import db
-from datetime import datetime
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,8 +11,6 @@ class Transaction(db.Model):
 
     bank_tran_id = db.Column(db.String(100))
 
-    # 🔥 audit fields (VERY IMPORTANT)
+    # 🔥 DEBUG FIELDS (IMPORTANT)
     raw_callback = db.Column(db.Text)
     raw_validation = db.Column(db.Text)
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
