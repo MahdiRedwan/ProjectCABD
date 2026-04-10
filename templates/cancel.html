@@ -2,14 +2,20 @@
 <html>
 <head>
     <title>Payment Cancelled</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body style="text-align:center; font-family:Arial;">
 
-<h1 style="color:orange;">🚫 Payment Cancelled</h1>
+<body>
 
-<p>You cancelled the transaction.</p>
+<div class="container">
 
-<button onclick="window.location.href='/'">Back to Home</button>
+    <h2 class="status-risk">⚠️ Payment Cancelled</h2>
+
+    <p>You cancelled the payment.</p>
+
+    <a href="/">🔁 Try Again</a>
+
+</div>
 
 </body>
 </html>

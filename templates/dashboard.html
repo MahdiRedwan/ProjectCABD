@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>📊 Transaction Dashboard</h2>
+
+    <table>
+        <tr>
+            <th>Transaction ID</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Payment Method</th>
+        </tr>
+
+        {% for t in txns %}
+        <tr>
+            <td>{{ t.tran_id }}</td>
+            <td>{{ t.amount }}</td>
+
+            <td class="
+                {% if t.status == 'SUCCESS' %}
+                    status-success
+                {% elif t.status == 'SUCCESS WITH RISK' %}
+                    status-risk
+                {% else %}
+                    status-failed
+                {% endif %}
+            ">
+                {{ t.status }}
+            </td>
+
+            <td>{{ t.payment_method }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <br>
+    <a href="/">🏠 Back to Home</a>
+
+</div>
+
+</body>
+</html>

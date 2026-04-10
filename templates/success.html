@@ -1,27 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Success</title>
+    <title>Payment Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body style="text-align:center; font-family:Arial; padding:50px;">
 
-    <h1 style="color:green;">Payment Successful ✅</h1>
+<body>
 
-    <p>Your transaction is completed.</p>
+<div class="container">
+
+    <h2>Payment Result</h2>
+
+    {% if txn.status == "SUCCESS" %}
+        <h3 class="status-success">✅ Payment Successful</h3>
+
+    {% elif txn.status == "SUCCESS WITH RISK" %}
+        <h3 class="status-risk">⚠️ Payment Successful (With Risk)</h3>
+
+    {% else %}
+        <h3 class="status-failed">❌ Payment Status Unknown</h3>
+    {% endif %}
+
+    <p><b>Transaction ID:</b> {{ txn.tran_id }}</p>
+    <p><b>Amount:</b> {{ txn.amount }}</p>
+    <p><b>Payment Method:</b> {{ txn.payment_method }}</p>
 
     <br>
 
-    <!-- 🔥 PAY AGAIN BUTTON -->
-    <a href="/" style="
-        background: green;
-        color: white;
-        padding: 12px 20px;
-        text-decoration: none;
-        border-radius: 8px;
-        display: inline-block;
-    ">
-        🔁 Pay Again
-    </a>
+    <a href="/">🔁 Pay Again</a>
+    <a href="/dashboard">📊 View Dashboard</a>
+
+</div>
 
 </body>
 </html>

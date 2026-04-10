@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Payment Demo</title>
+    <title>Payment Page</title>
+
+    <!-- ✅ PUT CSS LINK HERE -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <h2>SSLCommerz Payment Demo</h2>
 
-    <form action="/pay" method="POST">
-        <input type="number" name="amount" placeholder="Enter amount" required>
-        <button type="submit">Pay</button>
+<div class="container">
+    <h2>Payment Page</h2>
+
+    <form method="POST" action="/pay">
+        <input name="amount" placeholder="Enter amount" required>
+        <button type="submit">Pay Now</button>
     </form>
+</div>
 
-    <a href="/admin">Admin Dashboard</a>
 </body>
 </html>
