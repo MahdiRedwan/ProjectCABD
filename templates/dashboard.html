@@ -2,12 +2,14 @@
 <html>
 <head>
     <title>Payment Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-<h2>Transaction Dashboard</h2>
+<h2>💳 Payment Transaction Dashboard</h2>
 
-<table border="1" cellpadding="10">
+<table>
 
 <tr>
     <th>Transaction</th>
@@ -20,19 +22,31 @@
 <tr>
     <td>{{ t.tran_id }}</td>
     <td>{{ t.amount }}</td>
-    <td>{{ t.status }}</td>
+
+    <td>
+        {% if "SUCCESS WITH RISK" in t.status %}
+            <span class="status risk">⚠ {{ t.status }}</span>
+        {% elif "SUCCESS" in t.status %}
+            <span class="status success">✔ {{ t.status }}</span>
+        {% elif "FAILED" in t.status %}
+            <span class="status failed">✖ {{ t.status }}</span>
+        {% else %}
+            <span class="status pending">{{ t.status }}</span>
+        {% endif %}
+    </td>
+
     <td>{{ t.payment_method }}</td>
 </tr>
 
 <tr>
     <td colspan="4">
         <details>
-            <summary>🔍 View Full Raw Logs</summary>
+            <summary>🔍 View Raw SSLCommerz Logs</summary>
 
-            <h4>Callback Data</h4>
+            <h4>Callback</h4>
             <pre>{{ t.raw_callback }}</pre>
 
-            <h4>Validation / System Response</h4>
+            <h4>Validation</h4>
             <pre>{{ t.raw_validation }}</pre>
         </details>
     </td>
