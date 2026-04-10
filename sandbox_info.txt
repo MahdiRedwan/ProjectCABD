@@ -6,3 +6,5 @@ url:
 ngrok: 3C8WVzKC3z5D5MwyrDAakm3pYg9_4fstkTq8ZS72T8jpFVHy
 
 Login pass: Mahdi#Dev2026!
+
+Railway url: https://projectcabd-production.up.railway.app
